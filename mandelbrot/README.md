@@ -4,9 +4,10 @@ A simple command line utility to generate images of the infamous `Mandelbrot Set
 
 ## Usage
 
-You can build the binary using `cargo build --release`. Then run the following command to run the binary:
+You can build the binary using `cargo build --release`.
 
 Usage: `target/release/mandelbrot FILE PIXELS UPPERLEFT LOWERRIGHT`
+
 Example: `target/release/mandelbrot mandel.png 1000x750 -1.20,0.35 -1,0.20`
 
 where
