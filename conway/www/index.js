@@ -1,16 +1,21 @@
 import { Universe, Cell } from "conway";
 import { memory } from "conway/conway_bg";
 
-const CELL_SIZE = 5; // In pixels
+const CELL_SIZE = 8; // In pixels
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
-const HEIGHT = 100;
-const WIDTH = 100;
+const HEIGHT = 64;
+const WIDTH = 64;
+let fps = 20;
+let lastTickAt = 0;
+const fpsScaleFactor = 800;
 
 const universe = Universe.pattern_new(WIDTH, HEIGHT);
 
 const playPauseButton = document.getElementById("play-pause");
+const fpsElement = document.getElementById("fps-element");
+
 const canvas = document.getElementById("conway-canvas");
 canvas.height = (CELL_SIZE + 1) * HEIGHT + 1;
 canvas.width = (CELL_SIZE + 1) * WIDTH + 1;
@@ -25,10 +30,17 @@ const isPaused = () => {
 
 const renderLoop = () => {
 	// debugger;
-	universe.tick();
+	const now = Date.now();
+	const elapsed = now - lastTickAt;
 
-	drawGrid();
-	drawCells();
+	if (elapsed * fps > fpsScaleFactor) {
+		universe.tick();
+
+		drawGrid();
+		drawCells();
+
+		lastTickAt = now;
+	}
 	animationId = requestAnimationFrame(renderLoop);
 };
 
@@ -106,6 +118,11 @@ canvas.addEventListener("click", (event) => {
 
 	drawGrid();
 	drawCells();
+});
+
+fpsElement.addEventListener("input", function () {
+	fps = parseInt(this.value);
+	console.log(`FPS set to ${fps}.`);
 });
 
 drawGrid();

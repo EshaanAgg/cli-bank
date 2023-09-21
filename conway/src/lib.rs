@@ -3,14 +3,14 @@ mod utils;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
-extern crate web_sys;
+// extern crate web_sys;
 
-// A macro to provide `println!(..)`-style syntax for `console.log` logging.
-macro_rules! log {
-    ( $( $t:tt )* ) => {
-        web_sys::console::log_1(&format!( $( $t )* ).into());
-    }
-}
+// // A macro to provide `println!(..)`-style syntax for `console.log` logging.
+// macro_rules! log {
+//     ( $( $t:tt )* ) => {
+//         web_sys::console::log_1(&format!( $( $t )* ).into());
+//     }
+// }
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global allocator.
 // It is a special tiny allocator designed for WebAssembly.
@@ -81,13 +81,13 @@ impl Universe {
             }
         }
 
-        log!(
-            "cell[{}, {}] is initially {:?} and has {} live neighbors.",
-            row,
-            column,
-            self.cells[self.get_index(row, column)],
-            count
-        );
+        // log!(
+        //     "cell[{}, {}] is initially {:?} and has {} live neighbors.",
+        //     row,
+        //     column,
+        //     self.cells[self.get_index(row, column)],
+        //     count
+        // );
 
         count
     }
