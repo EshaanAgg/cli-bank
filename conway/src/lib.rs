@@ -36,6 +36,8 @@ pub struct Universe {
     cells: Vec<Cell>,
 }
 
+// Public methods are exported to JavaScript.
+#[wasm_bindgen]
 impl Universe {
     // Get the index of the cell in the memory given it's row and column
     fn get_index(&self, row: usize, column: usize) -> usize {
@@ -89,6 +91,9 @@ impl Universe {
     }
 
     pub fn new(width: usize, height: usize) -> Universe {
+        // Used for debugging purposes; set at a common path
+        utils::set_panic_hook();
+
         let cells = (0..width * height)
             .map(|i| {
                 if i % 2 == 0 || i % 7 == 0 {
@@ -108,6 +113,10 @@ impl Universe {
 
     pub fn render(&self) -> String {
         self.to_string()
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
     }
 }
 
