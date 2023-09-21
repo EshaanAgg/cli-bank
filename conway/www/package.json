@@ -1,0 +1,19 @@
+{
+	"name": "conway",
+	"version": "0.1.0",
+	"description": "The client side code for the conway project.",
+	"main": "index.js",
+	"scripts": {
+		"build": "webpack --config webpack.config.js",
+		"start": "export NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server"
+	},
+	"dependencies": {
+		"conway": "file:../pkg"
+	},
+	"devDependencies": {
+		"webpack": "^4.29.3",
+		"webpack-cli": "^3.1.0",
+		"webpack-dev-server": "^3.1.5",
+		"copy-webpack-plugin": "^5.0.0"
+	}
+}
