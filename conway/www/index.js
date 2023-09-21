@@ -8,19 +8,28 @@ const ALIVE_COLOR = "#000000";
 const HEIGHT = 100;
 const WIDTH = 100;
 
-const universe = Universe.new(WIDTH, HEIGHT);
+const universe = Universe.pattern_new(WIDTH, HEIGHT);
 
+const playPauseButton = document.getElementById("play-pause");
 const canvas = document.getElementById("conway-canvas");
 canvas.height = (CELL_SIZE + 1) * HEIGHT + 1;
 canvas.width = (CELL_SIZE + 1) * WIDTH + 1;
 
 const ctx = canvas.getContext("2d");
 
+let animationId = null;
+
+const isPaused = () => {
+	return animationId === null;
+};
+
 const renderLoop = () => {
+	// debugger;
 	universe.tick();
+
 	drawGrid();
 	drawCells();
-	requestAnimationFrame(renderLoop);
+	animationId = requestAnimationFrame(renderLoop);
 };
 
 const drawGrid = () => {
@@ -65,4 +74,40 @@ const drawCells = () => {
 	ctx.stroke();
 };
 
-requestAnimationFrame(renderLoop);
+const play = () => {
+	playPauseButton.textContent = "⏸";
+	renderLoop();
+};
+
+const pause = () => {
+	playPauseButton.textContent = "▶";
+	cancelAnimationFrame(animationId);
+	animationId = null;
+};
+
+playPauseButton.addEventListener("click", () => {
+	if (isPaused()) play();
+	else pause();
+});
+
+canvas.addEventListener("click", (event) => {
+	const boundingRect = canvas.getBoundingClientRect();
+
+	const scaleX = canvas.width / boundingRect.width;
+	const scaleY = canvas.height / boundingRect.height;
+
+	const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+	const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+
+	const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), HEIGHT - 1);
+	const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), WIDTH - 1);
+
+	universe.toggle_cell(row, col);
+
+	drawGrid();
+	drawCells();
+});
+
+drawGrid();
+drawCells();
+pause();

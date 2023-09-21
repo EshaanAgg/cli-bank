@@ -3,6 +3,15 @@ mod utils;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
+extern crate web_sys;
+
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global allocator.
 // It is a special tiny allocator designed for WebAssembly.
 #[cfg(feature = "wee_alloc")]
@@ -26,6 +35,15 @@ pub fn greet(name: &str) {
 pub enum Cell {
     Dead = 0,
     Alive = 1,
+}
+
+impl Cell {
+    fn toggle(&mut self) {
+        *self = match *self {
+            Cell::Dead => Cell::Alive,
+            Cell::Alive => Cell::Dead,
+        };
+    }
 }
 
 #[wasm_bindgen]
@@ -62,6 +80,15 @@ impl Universe {
                 count += self.cells[idx] as u8;
             }
         }
+
+        log!(
+            "cell[{}, {}] is initially {:?} and has {} live neighbors.",
+            row,
+            column,
+            self.cells[self.get_index(row, column)],
+            count
+        );
+
         count
     }
 
@@ -88,6 +115,11 @@ impl Universe {
                 self.cells[idx] = next_cell;
             }
         }
+    }
+
+    pub fn toggle_cell(&mut self, row: usize, column: usize) {
+        let idx = self.get_index(row, column);
+        self.cells[idx].toggle();
     }
 
     pub fn pattern_new(width: usize, height: usize) -> Universe {
