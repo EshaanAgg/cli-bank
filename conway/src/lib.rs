@@ -4,7 +4,7 @@ use std::fmt;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global allocator.
-// It is a specialtiny allocator designed for WebAssembly.
+// It is a special tiny allocator designed for WebAssembly.
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -49,9 +49,9 @@ impl Universe {
         let mut count = 0;
 
         // Instead of using -1 in delta, we use (+x -1) to avoid negative's while taking the modulo
-        for delta_row in [self.height - 1, 0, 1].iter() {
-            for delta_col in [self.width - 1, 0, 1].iter() {
-                if delta_row == &0 && delta_col == &0 {
+        for delta_row in [self.height - 1, 0, 1] {
+            for delta_col in [self.width - 1, 0, 1] {
+                if delta_row == 0 && delta_col == 0 {
                     continue;
                 }
 
@@ -73,16 +73,16 @@ impl Universe {
                 let live_neighbors = self.live_neighbor_count(row, col);
 
                 let next_cell = match (self.cells[idx], live_neighbors) {
-                    // Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
+                    // Any live cell with fewer than two live neighbours dies, as if caused by underpopulation
                     (Cell::Alive, x) if x < 2 => Cell::Dead,
-                    // Any live cell with two or three live neighbours lives on to the next generation.
+                    // Any live cell with two or three live neighbours lives on to the next generation
                     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
-                    // Any live cell with more than three live neighbours dies, as if by overpopulation.
+                    // Any live cell with more than three live neighbours dies, as if by overpopulation
                     (Cell::Alive, x) if x > 3 => Cell::Dead,
-                    // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+                    // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction
                     (Cell::Dead, 3) => Cell::Alive,
-                    // All other cells remain in the same state.
-                    (otherwise, _) => otherwise,
+                    // All other cells remain in the same state
+                    (org, _) => org,
                 };
 
                 self.cells[idx] = next_cell;
@@ -90,7 +90,7 @@ impl Universe {
         }
     }
 
-    pub fn new(width: usize, height: usize) -> Universe {
+    pub fn pattern_new(width: usize, height: usize) -> Universe {
         // Used for debugging purposes; set at a common path
         utils::set_panic_hook();
 
@@ -111,6 +111,19 @@ impl Universe {
         }
     }
 
+    pub fn new(width: usize, height: usize) -> Universe {
+        // Used for debugging purposes; set at a common path
+        utils::set_panic_hook();
+
+        let cells = vec![Cell::Dead; width * height];
+
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+
     pub fn render(&self) -> String {
         self.to_string()
     }
@@ -120,13 +133,28 @@ impl Universe {
     }
 }
 
+impl Universe {
+    /// Get the dead and alive values of the entire universe.
+    pub fn get_cells(&self) -> &[Cell] {
+        &self.cells
+    }
+
+    /// Set cells to be alive in a universe by passing the row and column of each cell as an array.
+    pub fn set_cells(&mut self, cells: &[(usize, usize)]) {
+        for &(row, col) in cells {
+            let idx = self.get_index(row, col);
+            self.cells[idx] = Cell::Alive;
+        }
+    }
+}
+
 impl fmt::Display for Universe {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for line in self.cells.as_slice().chunks(self.width) {
             for &cell in line {
                 let symbol = match cell {
-                    Cell::Dead => '◻',
-                    Cell::Alive => '◼',
+                    Cell::Dead => '0',
+                    Cell::Alive => '1',
                 };
                 write!(f, "{}", symbol)?;
             }
